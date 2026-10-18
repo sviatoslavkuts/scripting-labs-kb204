@@ -1,15 +1,17 @@
 import hashlib
-import os
 import hmac
+import os
 import re
-from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
-from typing import List, Set, Union
+from datetime import datetime, timedelta, timezone
 
 HASH_ITERATIONS = 100000
 
+
 class User:
-    def __init__(self, username: str, email: str, role: str = "user", active: bool = True):
+    def __init__(
+        self, username: str, email: str, role: str = "user", active: bool = True
+    ):
         self.username = username
         self.role = role
         self.active = active
@@ -31,20 +33,14 @@ class User:
     def set_password(self, password: str):
         self.__password_salt = os.urandom(16)
         self.__password_hash = hashlib.pbkdf2_hmac(
-            "sha256",
-            password.encode('utf-8'),
-            self.__password_salt,
-            HASH_ITERATIONS
+            "sha256", password.encode("utf-8"), self.__password_salt, HASH_ITERATIONS
         )
 
     def check_password(self, password: str) -> bool:
         if not self.__password_salt:
             return False
         check_hash = hashlib.pbkdf2_hmac(
-            "sha256",
-            password.encode('utf-8'),
-            self.__password_salt,
-            HASH_ITERATIONS
+            "sha256", password.encode("utf-8"), self.__password_salt, HASH_ITERATIONS
         )
         return hmac.compare_digest(self.__password_hash, check_hash)
 
@@ -59,7 +55,7 @@ class User:
 class Admin(User):
     def __init__(self, username: str, email: str, active: bool = True):
         super().__init__(username, email, role="admin", active=active)
-        self.permissions: Set[str] = set()
+        self.permissions: set[str] = set()
 
     def grant_permission(self, permission: str):
         self.permissions.add(permission)
@@ -87,7 +83,9 @@ class Session:
     def is_active(self, timeout_sec: int) -> bool:
         if timeout_sec <= 0:
             return False
-        return (datetime.now(timezone.utc) - self.last_activity) <= timedelta(seconds=timeout_sec)
+        return (datetime.now(timezone.utc) - self.last_activity) <= timedelta(
+            seconds=timeout_sec
+        )
 
 
 @dataclass
@@ -99,15 +97,19 @@ class AuditRecord:
 
 class AuditLog:
     def __init__(self):
-        self.records: List[AuditRecord] = []
+        self.records: list[AuditRecord] = []
 
     def add_log(self, username: str, action: str):
-        record = AuditRecord(timestamp=datetime.now(timezone.utc), username=username, action=action)
+        record = AuditRecord(
+            timestamp=datetime.now(timezone.utc), username=username, action=action
+        )
         self.records.append(record)
 
     def show_all(self):
         for record in self.records:
-            print(f"[{record.timestamp.isoformat()}] {record.username}: {record.action}")
+            print(
+                f"[{record.timestamp.isoformat()}] {record.username}: {record.action}"
+            )
 
 
 class UserAccount:
@@ -115,7 +117,7 @@ class UserAccount:
 
     def __init__(self, user: User, audit_log: AuditLog = None):
         self.user = user
-        self.session: Union[Session, None] = None
+        self.session: Session | None = None
         self.audit_log = audit_log if audit_log else AuditLog()
 
     def login(self, username: str, password: str, ip: str):
@@ -135,9 +137,7 @@ class UserAccount:
             return False
 
     def is_authenticated(self) -> bool:
-        if self.session and self.session.is_active(self.SESSION_TIMEOUT_SEC):
-            return True
-        return False
+        return bool(self.session and self.session.is_active(self.SESSION_TIMEOUT_SEC))
 
     def logout(self):
         if self.session:
