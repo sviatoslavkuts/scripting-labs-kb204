@@ -1,6 +1,7 @@
 import argparse
 import sys
 from labs.lab02.task1 import User, Admin, UserAccount, AuditLog
+from labs.lab02.task2 import EDRLogAggregator
 
 
 def run_demo():
@@ -62,17 +63,35 @@ def run_demo():
     audit.show_all()
 
 
+def run_analysis(filepath: str):
+    print(f"=== Запуск аналізу EDR-логів (Варіант 14) ===")
+    aggregator = EDRLogAggregator(filepath)
+    report = aggregator.generate_report()
+    print("\n" + report)
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Консольна утиліта лабораторної роботи №2 (Завдання 1)")
+    parser = argparse.ArgumentParser(description="Консольна утиліта лабораторної роботи №2")
     subparsers = parser.add_subparsers(dest="command", help="Доступні команди")
 
     # Режим демо для першого завдання
     subparsers.add_parser("demo", help="Запустити демонстрацію ООП-моделей Завдання 1")
 
+    # Режим аналізу для другого завдання (Варіант 14)
+    analyze_parser = subparsers.add_parser("analyze", help="Запустити агрегатор EDR-логів (Завдання 2)")
+    analyze_parser.add_argument(
+        "--file", 
+        type=str, 
+        default="labs/lab02/data/data_v14/edr_alerts.json", 
+        help="Шлях до JSON-файлу з логами загроз"
+    )
+
     args = parser.parse_args()
 
     if args.command == "demo":
         run_demo()
+    elif args.command == "analyze":
+        run_analysis(args.file)
     else:
         parser.print_help()
         sys.exit(1)
