@@ -57,10 +57,18 @@ def _extract_cvss_v31(metrics: Any) -> tuple[float | None, str | None, str | Non
         score = float(raw_score)
 
     raw_impact = cvss_data.get("availabilityImpact")
-    impact = raw_impact.strip().upper() if isinstance(raw_impact, str) and raw_impact.strip() else None
+    impact = (
+        raw_impact.strip().upper()
+        if isinstance(raw_impact, str) and raw_impact.strip()
+        else None
+    )
 
     raw_vector = cvss_data.get("vectorString")
-    vector = raw_vector.strip() if isinstance(raw_vector, str) and raw_vector.strip() else None
+    vector = (
+        raw_vector.strip()
+        if isinstance(raw_vector, str) and raw_vector.strip()
+        else None
+    )
 
     return score, impact, vector
 
@@ -96,7 +104,10 @@ def analyze_cves(
             skipped_missing_cvss += 1
             continue
 
-        if base_score >= active_rule.score_threshold and avail_impact == expected_impact:
+        if (
+            base_score >= active_rule.score_threshold
+            and avail_impact == expected_impact
+        ):
             matched.append(
                 {
                     "cve_id": cve_id.strip(),
@@ -104,7 +115,9 @@ def analyze_cves(
                     "base_score": base_score,
                     "availability_impact": avail_impact,
                     "vector_string": vector,
-                    "description": _extract_english_description(cve_obj.get("descriptions")),
+                    "description": _extract_english_description(
+                        cve_obj.get("descriptions")
+                    ),
                 }
             )
 
