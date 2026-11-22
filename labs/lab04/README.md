@@ -45,3 +45,30 @@
   python -m ruff format --check labs/lab04
   ```
 
+## 4. Формат звіту (JSON)
+
+```json
+{
+  "variant": 14,
+  "rule": {
+    "cvss_version": "3.1",
+    "min_base_score": 6.0,
+    "availability_impact": "LOW"
+  },
+  "total_vulnerabilities": 20,
+  "skipped_missing_cvss_v31": 19,
+  "matched_count": 0,
+  "matches": []
+}
+```
+
+## 5. Робота з Git
+
+```PowerShell
+git status
+git add labs/lab04/README.md
+git diff --cached
+git commit -m "docs(lab04): update README with report format and git workflow"
+git push
+```
+
