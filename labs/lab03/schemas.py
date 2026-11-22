@@ -1,4 +1,5 @@
 from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -28,7 +29,6 @@ class RecordCreate(BaseModel):
 
 class RecordReplace(RecordCreate):
     """Повна заміна змінюваних полів запису (успадковує RecordCreate)."""
-    pass
 
 
 class RecordRead(RecordCreate):

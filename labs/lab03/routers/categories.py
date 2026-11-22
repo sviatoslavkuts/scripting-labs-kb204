@@ -1,5 +1,5 @@
 import sqlite3
-from typing import List
+
 from fastapi import APIRouter, HTTPException, status
 
 from labs.lab03 import repository
@@ -8,7 +8,7 @@ from labs.lab03.schemas import CategoryCreate, CategoryRead
 router = APIRouter(prefix="/categories", tags=["Categories"])
 
 
-@router.get("", response_model=List[CategoryRead])
+@router.get("", response_model=list[CategoryRead])
 def get_categories():
     """Отримаємо список усіх категорій за зростанням id."""
     return repository.get_categories()
@@ -30,12 +30,16 @@ def create_category(category: CategoryCreate):
 def delete_category(category_id: int):
     """Видаляємо порожню категорію."""
     if category_id <= 0:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Некоректний ID.")
-    
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Некоректний ID."
+        )
+
     try:
         success = repository.delete_empty_category(category_id)
         if not success:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Категорію не знайдено.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Категорію не знайдено."
+            )
     except sqlite3.IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
